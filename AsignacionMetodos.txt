@@ -1,0 +1,254 @@
+ #region "variables globales"
+        SqlConnection cnx; //Declarando el objeto no lo inicializo
+        SqlCommand cmd; //Declarado
+        SqlDataReader dr;
+        SqlDataAdapter sda;
+        
+        #endregion
+
+        #region "Metodos globales"
+        private bool establecerConexion()
+        {
+            try
+            {
+                cnx = new SqlConnection();
+                cnx.ConnectionString = ConfigurationManager.ConnectionStrings["conexionProduccion"].ConnectionString;
+                cnx.Open();
+                if (cnx.State == ConnectionState.Open)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+        }
+
+        void RemoverDuplicacion(DropDownList ddl)
+        {
+            for (int i = 0; i < ddl.Items.Count; i++)
+            {
+                ddl.SelectedIndex = i;
+                string str = ddl.SelectedItem.ToString();
+                for (int counter = i + 1; counter < ddl.Items.Count; counter++)
+                {
+                    ddl.SelectedIndex = counter;
+                    string compareStr = ddl.SelectedItem.ToString();
+                    if (str == compareStr)
+                    {
+                        ddl.Items.RemoveAt(counter);
+                        counter = counter - 1;
+                    }
+                }
+            }
+        }
+        public void seleccionarNiño()
+        {
+            String query = "Select Persona_idPersona from Niño";
+            establecerConexion();
+            cmd = new SqlCommand(query, cnx);
+            SqlDataReader registro = cmd.ExecuteReader();
+            while (registro.Read())
+            {
+                ddNiño.Items.Add(registro["Persona_idPersona"].ToString());
+            }
+
+            cnx.Close();
+        }
+        public void seleccionarClase()
+        {
+            String query = "Select DISTINCT idClase from Clase";
+            establecerConexion();
+            cmd = new SqlCommand(query, cnx);
+            SqlDataReader registro = cmd.ExecuteReader();
+            while (registro.Read())
+            {
+                if (registro["idClase"].ToString() != ddClase.Items.ToString())
+                {
+
+                    ddClase.Items.Add(registro["idClase"].ToString());
+                }
+
+            }
+
+            cnx.Close();
+        }
+        public void seleccionarVoluntario()
+        {
+            String query = "Select Persona_idPersona from Tutor";
+            establecerConexion();
+            cmd = new SqlCommand(query, cnx);
+            SqlDataReader registro = cmd.ExecuteReader();
+            while (registro.Read())
+            {
+                ddUsuario.Items.Add(registro["Persona_idPersona"].ToString());
+            }
+
+            cnx.Close();
+        }
+        public void ingresarHorario()
+        {
+            try
+            {
+                String query = "INSERT INTO Asignacion_Horario(idAsignacion_Horario, Tutor_Persona_idPersona, Hora, Dia, Cantidad_horas, Clase_idClase, Clase_Niño_Persona_idPersona)" +
+               "VALUES(@idAsignacion_Horario, @Tutor_Persona_idPersona, @Hora, @Dia, @Cantidad_horas, @Clase_idClase, @Clase_Niño_Persona_idPersona)";
+                establecerConexion();
+                cmd = new SqlCommand(query, cnx);
+                cmd.Parameters.AddWithValue("@idAsignacion_Horario", Convert.ToInt32(txtHorario.Text));
+                cmd.Parameters.AddWithValue("@Tutor_Persona_idPersona", Convert.ToInt32(ddUsuario.SelectedValue));
+                cmd.Parameters.AddWithValue("@Hora", Convert.ToDateTime(txtTime.Text));
+                cmd.Parameters.AddWithValue("@Dia", Convert.ToString(ddDia.SelectedValue));
+                cmd.Parameters.AddWithValue("@Cantidad_horas", Convert.ToInt32(txtCantidad.Text));
+                cmd.Parameters.AddWithValue("@Clase_idClase", Convert.ToInt32(ddClase.SelectedValue));
+                cmd.Parameters.AddWithValue("@Clase_Niño_Persona_idPersona", Convert.ToInt32(ddNiño.SelectedValue));
+                cmd.ExecuteNonQuery();
+
+                lblMensaje.Visible = true;
+                lblMensaje.Text = "Registro agregado correctamente";
+
+            }
+            catch (Exception e)
+            {
+
+                lblMensaje.Visible = true;
+                lblMensaje.Text = e.ToString();
+            }
+
+
+
+        }
+        public void cargarHorario()
+        {
+            try
+            {
+                establecerConexion();
+                SqlDataAdapter da = new SqlDataAdapter("SELECT AA.idAsignacion_Horario, AA.Tutor_Persona_idPersona,(PP.Nombre)Nombre1,(PP.Apellido1)Apellido_1,(PP.Apellido2)Apellido_2 ,AA.Dia, AA.Hora,AA.Cantidad_horas,AA.Clase_idClase,AA.Clase_Niño_Persona_idPersona,p.Nombre,p.Apellido1,p.Apellido2 from Asignacion_Horario AA JOIN Tutor T ON T.Persona_idPersona = AA.Tutor_Persona_idPersona JOIN Persona PP ON PP.idPersona = T.Persona_idPersona JOIN Niño N on N.Persona_idPersona = AA.Clase_Niño_Persona_idPersona JOIN Persona P ON P.idPersona = N.Persona_idPersona", cnx);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                this.gVDatos.DataSource = dt;
+                gVDatos.DataBind();
+
+                cnx.Close();
+            }
+            catch (Exception e)
+            {
+
+                lblMensaje.Text = e.ToString();
+            }
+
+
+
+        }
+        public void FiltrarTutor()
+        {
+            try
+            {
+                establecerConexion();
+                SqlDataAdapter da = new SqlDataAdapter("SELECT AA.idAsignacion_Horario, AA.Tutor_Persona_idPersona,(PP.Nombre)Nombre1,(PP.Apellido1)Apellido_1,(PP.Apellido2)Apellido_2 ,AA.Dia, AA.Hora,AA.Cantidad_horas,AA.Clase_idClase,AA.Clase_Niño_Persona_idPersona,p.Nombre,p.Apellido1,p.Apellido2 from Asignacion_Horario AA JOIN Tutor T ON T.Persona_idPersona = AA.Tutor_Persona_idPersona JOIN Persona PP ON PP.idPersona = T.Persona_idPersona JOIN Niño N on N.Persona_idPersona = AA.Clase_Niño_Persona_idPersona JOIN Persona P ON P.idPersona = N.Persona_idPersona WHERE Tutor_Persona_idPersona = @Tutor_Persona_idPersona", cnx);
+                da.SelectCommand.Parameters.AddWithValue("@Tutor_Persona_idPersona", Convert.ToInt32(txtFiltro.Text));
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                this.gVDatos.DataSource = dt;
+                gVDatos.DataBind();
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+
+        }
+        public void EditarHorario()
+        {
+            try
+            {
+                String query = "UPDATE Asignacion_Horario SET Tutor_Persona_idPersona = @Tutor_Persona_idPersona, Hora = @Hora, Dia = @Dia, Cantidad_horas= @Cantidad_horas, Clase_idClase = @Clase_idClase, Clase_Niño_Persona_idPersona = @Clase_Niño_Persona_idPersona  WHERE idAsignacion_Horario = @idAsignacion_Horario";
+                establecerConexion();
+                cmd = new SqlCommand(query, cnx);
+                cmd.Parameters.AddWithValue("@idAsignacion_Horario", Convert.ToInt32(txtHorario.Text));
+                cmd.Parameters.AddWithValue("@Tutor_Persona_idPersona", Convert.ToInt32(ddUsuario.SelectedValue));
+                cmd.Parameters.AddWithValue("@Hora", Convert.ToDateTime(txtTime.Text));
+                cmd.Parameters.AddWithValue("@Dia", Convert.ToString(ddDia.SelectedValue));
+                cmd.Parameters.AddWithValue("@Cantidad_horas", Convert.ToInt32(txtCantidad.Text));
+                cmd.Parameters.AddWithValue("@Clase_idClase", Convert.ToInt32(ddClase.SelectedValue));
+                cmd.Parameters.AddWithValue("@Clase_Niño_Persona_idPersona", Convert.ToInt32(ddNiño.SelectedValue));
+                cmd.ExecuteNonQuery();
+                cnx.Close();
+
+            }
+            catch (Exception e)
+            {
+                lblMensaje.Text = e.ToString();
+
+            }
+
+
+        }
+        public void EliminarHorario()
+        {
+
+            try
+            {
+                String query = "DELETE FROM Asignacion_Horario WHERE idAsignacion_Horario = @idAsignacion_Horario";
+                establecerConexion();
+                cmd = new SqlCommand(query, cnx);
+                cmd.Parameters.AddWithValue("@idAsignacion_Horario", txtHorario.Text);
+                cmd.ExecuteNonQuery();
+                cnx.Close();
+
+            }
+            catch (Exception e)
+            {
+                lblMensaje.Text = e.ToString();
+
+            }
+
+        }
+
+
+        #endregion
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            seleccionarNiño();
+            seleccionarVoluntario();
+            seleccionarClase();
+            RemoverDuplicacion(ddClase);
+            RemoverDuplicacion(ddNiño);
+            RemoverDuplicacion(ddUsuario);
+            lblMensaje.Visible = false;
+            
+        }
+
+        protected void btnAceptar_Click(object sender, EventArgs e)
+        {
+            ingresarHorario();
+        }
+
+        protected void btnRefrescar_Click(object sender, EventArgs e)
+        {
+            cargarHorario();
+        }
+
+        protected void btnActualizar_Click(object sender, EventArgs e)
+        {
+            EditarHorario();
+        }
+
+        protected void btnFiltrar_Click(object sender, EventArgs e)
+        {
+            FiltrarTutor();
+        }
+
+        protected void btnEliminar_Click(object sender, EventArgs e)
+        {
+            EliminarHorario();
+        }

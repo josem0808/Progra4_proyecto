@@ -1,0 +1,144 @@
+<form id="form1" runat="server">
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <asp:Label ID="Label1" runat="server" Text="Numero de Horario"></asp:Label>
+                </div>
+                <div class="col-md-3">
+                    <asp:TextBox ID="txtHorario" runat="server"></asp:TextBox>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <asp:Label ID="ID_Estudiante" runat="server" Text="ID Estudiante"></asp:Label>
+                </div>
+                <div class="col-md-3">
+                    <asp:DropDownList ID="ddNiño" runat="server">
+                    </asp:DropDownList>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <asp:Label ID="Label2" runat="server" Text="ID Tutor"></asp:Label>
+                </div>
+                <div class="col-md-3">
+                    <asp:DropDownList ID="ddUsuario" runat="server">
+                    </asp:DropDownList>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <asp:Label ID="Label3" runat="server" Text="Hora Asignada"></asp:Label>
+                </div>
+                <div class="col-md-3">
+                    <asp:TextBox ID="txtTime" runat="server" Width="87px">hh:mm</asp:TextBox>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <asp:Label ID="Label4" runat="server" Text="Dia Asignado"></asp:Label>
+                </div>
+                <div class="col-md-3">
+                    <asp:DropDownList ID="ddDia" runat="server">
+                        <asp:ListItem>Lunes</asp:ListItem>
+                        <asp:ListItem>Martes</asp:ListItem>
+                        <asp:ListItem>Miercoles</asp:ListItem>
+                        <asp:ListItem>Jueves</asp:ListItem>
+                        <asp:ListItem>Viernes</asp:ListItem>
+                        <asp:ListItem>Sabado</asp:ListItem>
+                        <asp:ListItem>Domingo</asp:ListItem>
+                    </asp:DropDownList>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <asp:Label ID="Label8" runat="server" Text="Hora Asignada"></asp:Label>
+                </div>
+                <div class="col-md-3">
+                    <asp:TextBox ID="txtCantidad" runat="server"></asp:TextBox>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <asp:Label ID="Label5" runat="server" Text="Hora Asignada"></asp:Label>
+                </div>
+                <div class="col-md-3">
+                    <asp:TextBox ID="TextBox1" runat="server"></asp:TextBox>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <asp:Label ID="Label6" runat="server" Text="ID Clase"></asp:Label>
+                </div>
+                <div class="col-md-3">
+                    <asp:DropDownList ID="ddClase" runat="server">
+                    </asp:DropDownList>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-1">
+                    <asp:Button ID="btnAceptar" runat="server" OnClick="btnAceptar_Click" Text="Aceptar" />
+                </div>
+                <div class="col-md-1">
+                    <asp:Button ID="btnRefrescar" runat="server" OnClick="btnRefrescar_Click" Text="Refrescar" />
+                </div>
+                <div class="col-md-1">
+                   <asp:Button ID="btnActualizar" runat="server" OnClick="btnActualizar_Click" Text="Actualizar" />
+                </div>
+                <div class="col-md-1">
+                   <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" OnClick="btnEliminar_Click" />
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-1">
+                    <asp:Label ID="Label7" runat="server" Text="Filtrar por tutor"></asp:Label>
+                </div>
+                <div class="col-md-1">
+                    <asp:Button ID="btnFiltrar" runat="server" OnClick="btnFiltrar_Click" Text="Filtrar" />
+                </div>
+                <div class="col-md-2">
+                   <asp:TextBox ID="txtFiltro" runat="server"></asp:TextBox>
+                </div>
+            </div>
+        </div>
+
+        <asp:Label ID="lblMensaje" runat="server" Text="Label"></asp:Label>
+       
+        <asp:GridView ID="gVDatos" runat="server" AutoGenerateColumns="False">
+            <Columns>
+                <asp:BoundField DataField="idAsignacion_Horario" HeaderText="ID Horario" />
+                <asp:BoundField DataField="Tutor_Persona_idPersona" HeaderText="ID Tutor" />
+                <asp:BoundField DataField="Nombre1" HeaderText="Nombre" />
+                <asp:BoundField DataField="Apellido_1" HeaderText="Primer Apellido" />
+                <asp:BoundField DataField="Apellido_2" HeaderText="Segundo Apellido" />
+                <asp:BoundField DataField="Dia" HeaderText="Dia" />
+                <asp:BoundField DataField="Hora" HeaderText="Hora" />
+                <asp:BoundField DataField="Cantidad_horas" HeaderText="Cantidad de horas" />
+                <asp:BoundField DataField="Clase_idClase" HeaderText="ID Clase" />
+                <asp:BoundField DataField="Clase_Niño_Persona_idPersona" HeaderText="ID Alumno" />
+                <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
+                <asp:BoundField DataField="Apellido1" HeaderText="Primer Apellido" />
+                <asp:BoundField DataField="Apellido2" HeaderText="Segundo Apellido" />
+            </Columns>
+        </asp:GridView>
+        
+    </form>
