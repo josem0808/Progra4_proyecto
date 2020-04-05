@@ -1,0 +1,289 @@
+#region "Variables globales"
+        SqlConnection cnx; //Declarando el objeto no lo inicializo
+        SqlCommand cmd; //Declarado
+        SqlDataReader dr;
+        SqlDataAdapter sda;
+        Inicio instancia = new Inicio();
+        #endregion
+
+        #region "Metodos globales"
+
+        private bool establecerConexion()
+        {
+
+            try
+            {
+                cnx = new SqlConnection();
+                cnx.ConnectionString = ConfigurationManager.ConnectionStrings["conexionProduccion"].ConnectionString;
+                cnx.Open();
+                if (cnx.State == ConnectionState.Open)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+        }
+
+        public void ingresarPersona()
+        {
+            try
+            {
+                String query = "INSERT INTO Persona(idPersona, Nombre, Apellido1, Apellido2, Fecha_Nacimiento, Genero_idGenero)" +
+                "VALUES(@idPersona, @Nombre, @Apellido1, @Apellido2, @Fecha_Nacimiento, @Genero_idGenero)";
+                establecerConexion();
+                cmd = new SqlCommand(query, cnx);
+                if (txtCedula.Text == String.Empty)
+                {
+                    ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('Debes ingresar todos los datos')", true);
+                    cnx.Close();
+                    cnx.Dispose();
+                }
+                else
+                {
+                    cmd.Parameters.AddWithValue("@idPersona", Convert.ToInt32(txtCedula.Text));
+                    cmd.Parameters.AddWithValue("@Nombre", txtNombre.Text);
+                    cmd.Parameters.AddWithValue("@Apellido1", txtApellido_1.Text);
+                    cmd.Parameters.AddWithValue("@Apellido2", txtApellido_2.Text);
+                    cmd.Parameters.AddWithValue("@Fecha_Nacimiento", Convert.ToDateTime(txtFecha.Text));
+                    cmd.Parameters.AddWithValue("@Genero_idGenero", Convert.ToInt32(ddGenero.SelectedValue));
+                    cmd.ExecuteNonQuery();
+                    ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('Persona ingresada correctamente')", true);
+                    cnx.Close();
+                    cnx.Dispose();
+
+                }
+                
+            }
+            catch (Exception e)
+            {
+
+                ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('No se pudo ingresar el registro')", true);
+            }
+
+
+        }
+
+        public void cargarPersona(GridView datos)
+        {
+            try
+            {
+                establecerConexion();
+                SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM Persona", cnx);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                datos.DataSource = dt;
+                datos.DataBind();
+                cnx.Close();
+                cnx.Dispose();
+
+            }
+            catch (Exception e)
+            {
+
+                lblVal.Text = e.ToString();
+            }
+
+        }
+        void limpiarControles()
+        {
+            txtCedula.Text = String.Empty;
+            txtApellido_1.Text = String.Empty;
+            txtApellido_2.Text = String.Empty;
+            txtFecha.Text = String.Empty;
+            txtNombre.Text = String.Empty;
+            txtBuscar.Text = String.Empty;
+        }
+
+        public void buscarPersona()
+        {
+            try
+            {
+                if (txtBuscar.Text == String.Empty)
+                {
+                    ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('Debes ingresar el numero de registro a buscar')", true);
+
+                }
+                else
+                {
+                    establecerConexion();
+                    SqlDataAdapter da = new SqlDataAdapter("SELECT* FROM Persona WHERE idPersona LIKE '" + txtBuscar.Text + "%'", cnx);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    this.gVDatos.DataSource = dt;
+                    gVDatos.DataBind();
+                    cnx.Close();
+                    cnx.Dispose();
+
+                }
+                
+
+
+            }
+            catch (Exception e)
+            {
+
+                ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('No se pudo encontrar el registro')", true);
+            }
+
+
+        }
+
+        public void Eliminar()
+        {
+
+            try
+            {
+                String query = "DELETE FROM Persona WHERE idPersona = @idPersona";
+                establecerConexion();
+                int validar = 0;
+                cmd = new SqlCommand(query, cnx);
+                if (txtCedula.Text == String.Empty)
+                {
+                    ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('Debes ingresar el numero de registro a eliminar')", true);
+                    cnx.Close();
+                    cnx.Dispose();
+
+                }
+                else
+                {
+                    cmd.Parameters.AddWithValue("idPersona", txtCedula.Text);
+                    validar =  cmd.ExecuteNonQuery();
+                    if (validar == 1)
+                    {
+                        ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('Persona eliminada del registro')", true);
+                        cnx.Close();
+                        cnx.Dispose();
+                    }
+                    else
+                    {
+                        ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('No se encontro el registro')", true);
+                        cnx.Close();
+                        cnx.Dispose();
+                    }
+
+                }
+                
+                cnx.Close();
+
+            }
+            catch (Exception e)
+            {
+                ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('Error')"+e.ToString(), true);
+
+            }
+
+        }
+
+        public void Editar()
+        {
+
+            try
+            {
+                String query = "UPDATE Persona SET Nombre = @Nombre, Apellido1 = @Apellido1, Apellido2 = @Apellido2, Fecha_Nacimiento = @Fecha_Nacimiento, Genero_idGenero = @Genero_idGenero  WHERE idPersona = @idPersona ";
+                establecerConexion();
+                int validar = 0;
+                cmd = new SqlCommand(query, cnx);
+                if (txtCedula.Text == String.Empty)
+                {
+                    ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('Debes ingresar el numero de registro a editar')", true);
+                    cmd.ExecuteNonQuery();
+                    cnx.Close();
+                    cnx.Dispose();
+                }
+                else
+                {
+                    cmd.Parameters.AddWithValue("@idPersona", Convert.ToInt32(txtCedula.Text));
+                    cmd.Parameters.AddWithValue("@Nombre", txtNombre.Text);
+                    cmd.Parameters.AddWithValue("@Apellido1", txtApellido_1.Text);
+                    cmd.Parameters.AddWithValue("@Apellido2", txtApellido_2.Text);
+                    cmd.Parameters.AddWithValue("@Fecha_Nacimiento", Convert.ToDateTime(txtFecha.Text));
+                    cmd.Parameters.AddWithValue("@Genero_idGenero", Convert.ToInt32(ddGenero.SelectedValue));
+                    validar = cmd.ExecuteNonQuery();
+                    if (validar == 1)
+                    {
+                        ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('Registro editado correctamente')", true);
+                        cnx.Close();
+                        cnx.Dispose();
+
+                    }
+                    else
+                    {
+                        ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('No se pudo encontrar el registro a editar')", true);
+                        cnx.Close();
+                        cnx.Dispose();
+                    }
+                    
+
+                }
+               
+            }
+            catch (Exception e)
+            {
+
+                ScriptManager.RegisterStartupScript(Page, this.GetType(), "clave1", "Swal.fire('No se pudo editar el registro')", true);
+            }
+
+        }
+        #endregion
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            instancia.esconderCalendario(caleFecha);
+        }
+
+        protected void ddGenero_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btnIngresar_Click(object sender, EventArgs e)
+        {
+            ingresarPersona();
+            cargarPersona(gVDatos);
+            limpiarControles();
+
+        }
+
+        protected void btnRefrescar_Click(object sender, EventArgs e)
+        {
+            cargarPersona(gVDatos);
+        }
+
+        protected void btnEliminar_Click(object sender, EventArgs e)
+        {
+            Eliminar();
+            cargarPersona(gVDatos);
+            limpiarControles();
+        }
+
+        protected void btnEditar_Click(object sender, EventArgs e)
+        {
+            Editar();
+            cargarPersona(gVDatos);
+            limpiarControles();
+        }
+
+        protected void btnBuscar_Click(object sender, EventArgs e)
+        {
+            buscarPersona();
+            limpiarControles();
+        }
+
+        protected void imgBtn_Click(object sender, ImageClickEventArgs e)
+        {
+            instancia.verClendario(caleFecha);
+        }
+
+        protected void caleFecha_SelectionChanged(object sender, EventArgs e)
+        {
+            instancia.fecha(txtFecha, caleFecha);
+        }
+    }
